@@ -1,11 +1,215 @@
-[gd_scene load_steps=5 format=3 uid="uid://bj4m25q3cbdav"]
+[gd_scene load_steps=13 format=3 uid="uid://bj4m25q3cbdav"]
 
 [ext_resource type="Script" uid="uid://su71ys0dpfy8" path="res://character_controller/cactus_character.gd" id="1_a3la2"]
+[ext_resource type="Texture2D" uid="uid://dt31dvgchwonf" path="res://art/spikes.png" id="2_sa5no"]
 [ext_resource type="Texture2D" uid="uid://imw37psvldad" path="res://art/ball.png" id="3_flpg2"]
 [ext_resource type="Texture2D" uid="uid://bl22i2swcir0u" path="res://art/face.png" id="3_sa5no"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdr8x"]
 radius = 25.0
+
+[sub_resource type="Animation" id="Animation_8vj48"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../FaceSprite:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.75, 0.75)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:skew")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_sa5no"]
+resource_name = "jump"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.93, 1.075), Vector2(0.85, 1.25), Vector2(1.3, 0.8)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../FaceSprite:scale")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.638, 0.758), Vector2(0.638, 0.938), Vector2(0.975, 0.6)]
+}
+
+[sub_resource type="Animation" id="Animation_b6phq"]
+resource_name = "land"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.2, 0.75), Vector2(1.3, 0.75), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../FaceSprite:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.75, 0.75), Vector2(0.975, 0.563), Vector2(0.75, 0.75)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 5.425), Vector2(0, 5.335), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_fl4nu"]
+resource_name = "fall"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.2, 0.9)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../FaceSprite:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.75, 0.75), Vector2(0.9, 0.675)]
+}
+
+[sub_resource type="Animation" id="Animation_8fxv4"]
+resource_name = "fall_loop"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.2, 0.9), Vector2(1.25, 0.85), Vector2(1.2, 0.9)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../FaceSprite:scale")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.9, 0.675), Vector2(1.013, 0.6), Vector2(0.975, 0.6)]
+}
+
+[sub_resource type="Animation" id="Animation_57hka"]
+resource_name = "speeding"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:skew")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [-0.139626, -0.20944, -0.139626]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_b6phq"]
+_data = {
+&"RESET": SubResource("Animation_8vj48"),
+&"fall": SubResource("Animation_fl4nu"),
+&"fall_loop": SubResource("Animation_8fxv4"),
+&"jump": SubResource("Animation_sa5no"),
+&"land": SubResource("Animation_b6phq"),
+&"speeding": SubResource("Animation_57hka")
+}
 
 [node name="CactusPlayer" type="CharacterBody2D"]
 collision_mask = 6
@@ -15,11 +219,8 @@ floor_max_angle = 1.48353
 script = ExtResource("1_a3la2")
 
 [node name="RollingCollisionBody" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource("CircleShape2D_kdr8x")
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.75, 0.75)
-texture = ExtResource("3_flpg2")
 
 [node name="GroundSensorCast" type="RayCast2D" parent="."]
 visible = false
@@ -33,14 +234,34 @@ target_position = Vector2(35, 35)
 collision_mask = 6
 
 [node name="velvector" type="RayCast2D" parent="."]
+visible = false
 target_position = Vector2(0, -65)
 collision_mask = 0
 
 [node name="sensornormal" type="RayCast2D" parent="."]
+visible = false
 self_modulate = Color(0.552177, 0.562957, 5.77569e-07, 1)
 target_position = Vector2(0, -84)
 collision_mask = 0
 
+[node name="Sprites" type="Node2D" parent="."]
+
+[node name="SpikesSprite" type="Sprite2D" parent="Sprites"]
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_sa5no")
+
+[node name="Sprite2D" type="Sprite2D" parent="Sprites"]
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("3_flpg2")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Sprites"]
+libraries = {
+&"": SubResource("AnimationLibrary_b6phq")
+}
+
 [node name="FaceSprite" type="Sprite2D" parent="."]
+position = Vector2(0, 5.425)
 scale = Vector2(0.75, 0.75)
 texture = ExtResource("3_sa5no")
+
+[connection signal="animation_changed" from="Sprites/AnimationPlayer" to="." method="sprite_anim_changed"]

@@ -8,6 +8,6 @@
 [node name="TestLevel" parent="." instance=ExtResource("1_0xm2m")]
 
 [node name="CactusPlayer" parent="." instance=ExtResource("2_h2yge")]
-position = Vector2(578, 210)
+position = Vector2(579, 322)
 
 [node name="Camera2D" type="Camera2D" parent="CactusPlayer"]

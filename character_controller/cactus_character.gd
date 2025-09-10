@@ -14,14 +14,22 @@ var move_state: movementMode = movementMode.ROLL
 var is_grounded: bool = false
 var is_jumping: bool = false
 
+var is_falling_animation: bool = false
+var speeding: bool = false
+const SPEEDING_LIMIT: float = 550.0
+
 var circumference: float
 var ang_velocity: float
 const ANG_FRICTION: float = PI/16
 
 @onready var body = $RollingCollisionBody
-@onready var sprite = $Sprite2D
+@onready var sprite_mask = $Sprites
+@onready var sprite = $Sprites/Sprite2D
+@onready var spikes = $Sprites/SpikesSprite
+@onready var face = $FaceSprite
 @onready var sensor = $GroundSensorCast
 @onready var snap_sensor = $AirborneSensorCast
+@onready var anim_player = $Sprites/AnimationPlayer
 
 
 func _ready() -> void:
@@ -54,6 +62,8 @@ func _physics_process(delta: float) -> void:
 		velocity += GRAVITY * delta
 	
 	sprite_roll(delta)
+	sprite_speed()
+	face_shift()
 	
 	if move_and_slide(): #if collision occurs
 		calculate_floor_angle()
@@ -66,6 +76,7 @@ func _physics_process(delta: float) -> void:
 func calculate_floor_angle() -> void: # only called if a collision is happening
 	if is_on_floor_only():
 		up_direction = get_last_slide_collision().get_normal()
+		sprite_land()
 		is_grounded = true
 		
 	elif !is_grounded: #if in air but contacting a surface...
@@ -75,6 +86,7 @@ func calculate_floor_angle() -> void: # only called if a collision is happening
 				up_direction = Vector2.UP
 				is_grounded = false
 		else: 
+			sprite_land()
 			is_grounded = true
 	else: 
 		up_direction = Vector2.UP
@@ -94,6 +106,7 @@ func sensor_vector() -> void:
 		snap_sensor.rotation = velocity.angle()
 		if velocity.x < 0:
 			snap_sensor.rotate(1.5* PI)
+		sprite_fall()
 		sphere_snap()
 	else: # we must either be jumping or went off an edge
 		# follow velocity for future snapping
@@ -102,14 +115,26 @@ func sensor_vector() -> void:
 		snap_sensor.rotation = velocity.angle()
 		if velocity.x < 0:
 			snap_sensor.rotate(1.5* PI)
+		sprite_fall()
 		sphere_snap()
 
 
 func sphere_snap() -> void:
 	if snap_sensor.is_colliding():
-		up_direction = snap_sensor.get_collision_normal()
-		print("Sphere snap!")
-		apply_floor_snap()
+		if snap_sensor.get_collider().get_collision_layer() == 4:
+			#slippery wall
+			if snap_sensor.get_collision_normal().angle_to(Vector2.UP) < PI/8:
+				up_direction = Vector2.UP
+				is_grounded = false
+			else:
+				up_direction = snap_sensor.get_collision_normal()
+				sprite_land()
+				apply_floor_snap()
+		else: # sticky wall
+			up_direction = snap_sensor.get_collision_normal()
+			sprite_land()
+			apply_floor_snap()
+
 
 func sprite_roll(delta: float) -> void:
 	var distance: float = velocity.length() * delta
@@ -126,6 +151,62 @@ func sprite_roll(delta: float) -> void:
 			ang_velocity = min(0, ang_velocity + ANG_FRICTION * delta)
 	
 	sprite.rotate(ang_velocity)
+	spikes.rotate(ang_velocity)
+	
+	if is_falling_animation:
+		sprite_mask.rotation = velocity.angle()
+
+
+func face_shift() -> void:
+	var factor = velocity.length() / MAX_VELOCITY
+	face.position = velocity.normalized() * factor * 5
+
+
+func sprite_jump() -> void:
+	sprite_mask.rotation = up_direction.angle()
+	anim_player.play("jump")
+	anim_player.queue("fall_loop")
+
+
+func sprite_fall() -> void:
+	if !is_falling_animation:
+		anim_player.play("fall")
+	anim_player.queue("fall_loop")
+	is_falling_animation = true
+
+
+func sprite_land() -> void:
+	if is_falling_animation:
+		sprite_mask.rotation = up_direction.angle() + PI/2
+		anim_player.play("land")
+		is_falling_animation = false
+
+
+func sprite_speed() -> void:
+	if velocity.length() > SPEEDING_LIMIT:
+		speeding = true
+		if velocity.x > 0:
+			sprite_mask.skew = deg_to_rad(maxf(0.0, ((velocity.x - SPEEDING_LIMIT) / 25)))
+		if velocity.x < 0:
+			sprite_mask.skew = deg_to_rad(minf(0.0, (velocity.x + SPEEDING_LIMIT) / 25))
+	else:
+		speeding = false
+		sprite_mask.skew = 0.0
+	
+	if speeding and abs(up_direction.angle_to(Vector2.DOWN)) < PI / 2:
+		sprite_mask.skew = sprite_mask.skew * -1
+
+
+func sprite_anim_changed(old_anim, new_anim) -> void:
+	print("Animation changed: " + old_anim + " -> " + new_anim)
+	if new_anim == "fall_loop":
+		is_falling_animation = true
+	
+	if old_anim == "fall_loop":
+		is_falling_animation = false
+	
+	if old_anim == "land":
+		sprite_mask.rotation = 0;
 
 
 func get_input() -> Vector2:
@@ -140,3 +221,4 @@ func _input(event: InputEvent) -> void:
 		print("jump pressed")
 		velocity += up_direction * JUMP_STRENGTH
 		is_jumping = true
+		sprite_jump()
