@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://bj4m25q3cbdav"]
+
+[ext_resource type="Script" uid="uid://su71ys0dpfy8" path="res://character_controller/cactus_character.gd" id="1_a3la2"]
+[ext_resource type="Texture2D" uid="uid://imw37psvldad" path="res://art/ball.png" id="3_flpg2"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kdr8x"]
+radius = 25.02
+
+[node name="CactusPlayer" type="CharacterBody2D"]
+collision_mask = 2
+floor_stop_on_slope = false
+script = ExtResource("1_a3la2")
+
+[node name="RollingCollisionBody" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_kdr8x")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("3_flpg2")

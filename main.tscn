@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://dv2fvm0k6kwgk"]
+
+[ext_resource type="PackedScene" uid="uid://ddejxwou8bqg4" path="res://scenes/test_level.tscn" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://bj4m25q3cbdav" path="res://character_controller/cactus_character.tscn" id="2_h2yge"]
+
+[node name="Main" type="Node2D"]
+
+[node name="TestLevel" parent="." instance=ExtResource("1_0xm2m")]
+
+[node name="CactusPlayer" parent="." instance=ExtResource("2_h2yge")]
+position = Vector2(578, 210)
