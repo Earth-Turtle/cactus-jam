@@ -1,16 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://ddejxwou8bqg4"]
+[gd_scene load_steps=5 format=3 uid="uid://ddejxwou8bqg4"]
 
 [ext_resource type="Script" uid="uid://bxxcp568708jo" path="res://scripts/terrain.gd" id="1_2venv"]
 
 [sub_resource type="Curve2D" id="Curve2D_paw1w"]
 bake_interval = 40.0
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 164, 412, -99.5716, -33.4993, 99.5716, 33.4993, 331, 514, -63.8028, -0.214218, 63.8028, 0.214218, 550, 552, -90.7688, 107.516, 90.7688, -107.516, 852, 446, 0, 0, 0, 0, 959, 214, 0, 0, 0, 0, 960, 546, 0, 0, 0, 0, 608, 635, 0, 0, 0, 0, 428, 609, 0, 0, 0, 0, 208, 532, 0, 0, 0, 0, 164, 412)
+"points": PackedVector2Array(0, 0, 0, 0, 164, 412, -99.5716, -33.4993, 99.5716, 33.4993, 331, 514, -63.8028, -0.214218, 63.8028, 0.214218, 550, 552, -90.7688, 107.516, 90.7688, -107.516, 852, 446, 0, 0, 0, 0, 959, 214, -24.8368, 24.8368, 24.8368, -24.8368, 985, 162, 0, 0, 0, 0, 1060, 146, -29.1833, -22.3532, 29.1833, 22.3532, 1130, 174, 0, 0, 0, 0, 1188, 263, 0, 0, 0, 0, 1132, 455, 0, 0, 0, 0, 979, 634, 0, 0, 0, 0, 608, 635, 0, 0, 0, 0, 428, 609, 0, 0, 0, 0, 208, 532, 0, 0, 0, 0, 164, 412)
 }
-point_count = 10
+point_count = 15
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2venv"]
 size = Vector2(226, 56)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_paw1w"]
+size = Vector2(38, 119)
 
 [node name="TestLevel" type="Node2D"]
 
@@ -30,7 +33,11 @@ curve = SubResource("Curve2D_paw1w")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2(584, 388)
-collision_layer = 2
+collision_layer = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 shape = SubResource("RectangleShape2D_2venv")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-126, -78)
+shape = SubResource("RectangleShape2D_paw1w")
