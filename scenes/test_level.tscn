@@ -1,9 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://ddejxwou8bqg4"]
+[gd_scene load_steps=9 format=3 uid="uid://ddejxwou8bqg4"]
 
 [ext_resource type="Script" uid="uid://bxxcp568708jo" path="res://scripts/terrain.gd" id="1_2venv"]
 
 [sub_resource type="Curve2D" id="Curve2D_paw1w"]
-bake_interval = 40.0
+bake_interval = 20.0
 _data = {
 "points": PackedVector2Array(0, 0, 0, 0, 164, 412, -99.5716, -33.4993, 99.5716, 33.4993, 331, 514, -63.8028, -0.214218, 63.8028, 0.214218, 550, 552, -90.7688, 107.516, 90.7688, -107.516, 852, 446, 0, 0, 0, 0, 959, 214, -24.8368, 24.8368, 24.8368, -24.8368, 985, 162, 0, 0, 0, 0, 1060, 146, -29.1833, -22.3532, 29.1833, 22.3532, 1130, 174, 0, 0, 0, 0, 1188, 263, 0, 0, 0, 0, 1132, 455, 0, 0, 0, 0, 979, 634, 0, 0, 0, 0, 608, 635, 0, 0, 0, 0, 428, 609, 0, 0, 0, 0, 208, 532, 0, 0, 0, 0, 164, 412)
 }
@@ -14,6 +14,25 @@ size = Vector2(226, 56)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_paw1w"]
 size = Vector2(38, 119)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j6w7d"]
+size = Vector2(600.25, 22.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ahbqi"]
+size = Vector2(322.5, 22.5)
+
+[sub_resource type="Curve2D" id="Curve2D_2venv"]
+bake_interval = 20.0
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 1066, -1, -34.1507, -31.4186, 34.1507, 31.4186, 1184, 44, -40.6942, -32.2019, 40.6942, 32.2019, 1316, 186, -54.0012, -4.95454, 54.0012, 4.95454, 1502, 255, -92.8898, 23.2225, 92.8898, -23.2225, 1803, 236, -18.2645, 117.51, 18.2645, -117.51, 1976, 74, 26.3636, 58.1818, -26.3636, -58.1818, 1951, -153, 103.636, 40.9091, -103.636, -40.9091, 1740, -324, 0, 0, 0, 0, 1500, -382, 132.727, -6.36364, -132.727, 6.36364, 1264, -394, 0, 0, 0, 0, 1072, -368, 0, 0, 0, 0, 1163, -407, 0, 0, 0, 0, 1266, -440, 0, 0, 0, 0, 1598, -420, 0, 0, 0, 0, 1840, -319, 0, 0, 0, 0, 1977, -187, 0, 0, 0, 0, 2066, 15, 0, 0, 0, 0, 2070, 269, 0, 0, 0, 0, 1911, 411, 0, 0, 0, 0, 1426, 453, 0, 0, 0, 0, 1313, 354, 0, 0, 0, 0, 1229, 250, 0, 0, 0, 0, 1182, 157, 0, 0, 0, 0, 1153, 111, 0, 0, 0, 0, 1114, 54, 0, 0, 0, 0, 1066, -1)
+}
+point_count = 26
+
+[sub_resource type="Curve2D" id="Curve2D_j6w7d"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 273, -235, 58.3666, 55.262, -58.3666, -55.262, 146, -283, 0, 0, 0, 0, 102, -396, 0, 0, 0, 0, 90, -396, 0, 0, 0, 0, 89, -226, 0, 0, 0, 0, 273, -225, 0, 0, 0, 0, 273, -235)
+}
+point_count = 7
 
 [node name="TestLevel" type="Node2D"]
 
@@ -41,3 +60,39 @@ shape = SubResource("RectangleShape2D_2venv")
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(-126, -78)
 shape = SubResource("RectangleShape2D_paw1w")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(3, -614)
+shape = SubResource("RectangleShape2D_j6w7d")
+
+[node name="CollisionShape2D8" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-740, -934)
+shape = SubResource("RectangleShape2D_ahbqi")
+
+[node name="Terrain2" type="StaticBody2D" parent="."]
+collision_layer = 2
+script = ExtResource("1_2venv")
+
+[node name="Path2D" type="Path2D" parent="Terrain2"]
+position = Vector2(14, -2)
+curve = SubResource("Curve2D_2venv")
+
+[node name="Line2D" type="Line2D" parent="Terrain2"]
+
+[node name="Polygon2D" type="Polygon2D" parent="Terrain2"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Terrain2"]
+
+[node name="Terrain3" type="StaticBody2D" parent="."]
+collision_layer = 2
+script = ExtResource("1_2venv")
+
+[node name="Path2D" type="Path2D" parent="Terrain3"]
+position = Vector2(14, -2)
+curve = SubResource("Curve2D_j6w7d")
+
+[node name="Line2D" type="Line2D" parent="Terrain3"]
+
+[node name="Polygon2D" type="Polygon2D" parent="Terrain3"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Terrain3"]

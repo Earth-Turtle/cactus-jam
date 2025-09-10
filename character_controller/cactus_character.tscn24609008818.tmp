@@ -2,10 +2,12 @@
 
 [ext_resource type="Script" uid="uid://su71ys0dpfy8" path="res://character_controller/cactus_character.gd" id="1_a3la2"]
 [ext_resource type="Texture2D" uid="uid://imw37psvldad" path="res://art/ball.png" id="3_flpg2"]
-[ext_resource type="Texture2D" uid="uid://bl22i2swcir0u" path="res://art/face.png" id="3_sa5no"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdr8x"]
 radius = 25.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wg63q"]
+radius = 32.0156
 
 [node name="CactusPlayer" type="CharacterBody2D"]
 collision_mask = 6
@@ -22,25 +24,8 @@ scale = Vector2(0.75, 0.75)
 texture = ExtResource("3_flpg2")
 
 [node name="GroundSensorCast" type="RayCast2D" parent="."]
-visible = false
 target_position = Vector2(0, 35)
 collision_mask = 6
 
-[node name="AirborneSensorCast" type="RayCast2D" parent="."]
-visible = false
-self_modulate = Color(0.696546, 0.277803, 1, 1)
-target_position = Vector2(35, 35)
-collision_mask = 6
-
-[node name="velvector" type="RayCast2D" parent="."]
-target_position = Vector2(0, -65)
-collision_mask = 0
-
-[node name="sensornormal" type="RayCast2D" parent="."]
-self_modulate = Color(0.552177, 0.562957, 5.77569e-07, 1)
-target_position = Vector2(0, -84)
-collision_mask = 0
-
-[node name="FaceSprite" type="Sprite2D" parent="."]
-scale = Vector2(0.75, 0.75)
-texture = ExtResource("3_sa5no")
+[node name="GroundSensorSphere" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_wg63q")

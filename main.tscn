@@ -9,3 +9,5 @@
 
 [node name="CactusPlayer" parent="." instance=ExtResource("2_h2yge")]
 position = Vector2(578, 210)
+
+[node name="Camera2D" type="Camera2D" parent="CactusPlayer"]
