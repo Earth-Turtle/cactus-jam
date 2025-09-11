@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dwfkml8ge6fjc"]
+
+[ext_resource type="Shader" uid="uid://bclcy35fsbehu" path="res://shaders/radial_blur_shader.gdshader" id="1_16152"]
+
+[resource]
+shader = ExtResource("1_16152")
+shader_parameter/pivot = Vector2(0, 0)
+shader_parameter/amount = 0.0
+shader_parameter/quality = 3
+shader_parameter/marginDebug = false

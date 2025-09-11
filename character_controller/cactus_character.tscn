@@ -1,12 +1,19 @@
-[gd_scene load_steps=13 format=3 uid="uid://bj4m25q3cbdav"]
+[gd_scene load_steps=19 format=3 uid="uid://bj4m25q3cbdav"]
 
 [ext_resource type="Script" uid="uid://su71ys0dpfy8" path="res://character_controller/cactus_character.gd" id="1_a3la2"]
+[ext_resource type="Material" uid="uid://dwfkml8ge6fjc" path="res://shaders/radial_blur_shader.tres" id="2_8fxv4"]
 [ext_resource type="Texture2D" uid="uid://dt31dvgchwonf" path="res://art/spikes.png" id="2_sa5no"]
 [ext_resource type="Texture2D" uid="uid://imw37psvldad" path="res://art/ball.png" id="3_flpg2"]
 [ext_resource type="Texture2D" uid="uid://bl22i2swcir0u" path="res://art/face.png" id="3_sa5no"]
+[ext_resource type="Script" uid="uid://cken6h6q8dnbg" path="res://character_controller/state_machine.gd" id="5_8vj48"]
+[ext_resource type="Script" uid="uid://bbfmuqel5wg83" path="res://character_controller/rolling_state.gd" id="6_fl4nu"]
+[ext_resource type="Script" uid="uid://bxth4v4qmomc8" path="res://character_controller/spines_state.gd" id="7_8fxv4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdr8x"]
 radius = 25.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fl4nu"]
+radius = 33.0151
 
 [sub_resource type="Animation" id="Animation_8vj48"]
 length = 0.001
@@ -103,18 +110,6 @@ tracks/0/keys = {
 "update": 0,
 "values": [Vector2(1.2, 0.9), Vector2(1.25, 0.85), Vector2(1.2, 0.9)]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("../FaceSprite:scale")
-tracks/1/interp = 2
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(0.9, 0.675), Vector2(1.013, 0.6), Vector2(0.975, 0.6)]
-}
 
 [sub_resource type="Animation" id="Animation_sa5no"]
 resource_name = "jump"
@@ -201,9 +196,38 @@ tracks/0/keys = {
 "values": [-0.139626, -0.20944, -0.139626]
 }
 
+[sub_resource type="Animation" id="Animation_lqmuw"]
+resource_name = "bounce"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.5, 0.75), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../FaceSprite:scale")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.975, 0.6), Vector2(0.975, 0.6)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_b6phq"]
 _data = {
 &"RESET": SubResource("Animation_8vj48"),
+&"bounce": SubResource("Animation_lqmuw"),
 &"fall": SubResource("Animation_fl4nu"),
 &"fall_loop": SubResource("Animation_8fxv4"),
 &"jump": SubResource("Animation_sa5no"),
@@ -222,16 +246,29 @@ script = ExtResource("1_a3la2")
 visible = false
 shape = SubResource("CircleShape2D_kdr8x")
 
+[node name="SpinesCollisionBody" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_fl4nu")
+disabled = true
+
+[node name="BounceSensorCast" type="RayCast2D" parent="."]
+visible = false
+target_position = Vector2(0, -41)
+collision_mask = 6
+
 [node name="GroundSensorCast" type="RayCast2D" parent="."]
+visible = false
 target_position = Vector2(0, 35)
 collision_mask = 6
 
 [node name="AirborneSensorCast" type="RayCast2D" parent="."]
+visible = false
 self_modulate = Color(0.696546, 0.277803, 1, 1)
 target_position = Vector2(35, 35)
 collision_mask = 6
 
 [node name="velvector" type="RayCast2D" parent="."]
+visible = false
 target_position = Vector2(0, -65)
 collision_mask = 0
 
@@ -244,10 +281,12 @@ collision_mask = 0
 [node name="Sprites" type="Node2D" parent="."]
 
 [node name="SpikesSprite" type="Sprite2D" parent="Sprites"]
-scale = Vector2(0.7, 0.7)
+material = ExtResource("2_8fxv4")
+scale = Vector2(0.75, 0.75)
 texture = ExtResource("2_sa5no")
 
 [node name="Sprite2D" type="Sprite2D" parent="Sprites"]
+material = ExtResource("2_8fxv4")
 scale = Vector2(0.75, 0.75)
 texture = ExtResource("3_flpg2")
 
@@ -257,8 +296,20 @@ libraries = {
 }
 
 [node name="FaceSprite" type="Sprite2D" parent="."]
-position = Vector2(0, 5.425)
 scale = Vector2(0.75, 0.75)
 texture = ExtResource("3_sa5no")
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("5_8vj48")
+
+[node name="RollingState" type="Node" parent="StateMachine"]
+script = ExtResource("6_fl4nu")
+
+[node name="SpinesState" type="Node" parent="StateMachine"]
+script = ExtResource("7_8fxv4")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 17.0
 
 [connection signal="animation_changed" from="Sprites/AnimationPlayer" to="." method="sprite_anim_changed"]

@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 enum movementMode { ROLL, SPINY }
+enum Player { LEFT, RIGHT, UP, DOWN }
 
 const GRAVITY: Vector2i = Vector2i(0.0, -650.0)
 const ACCELERATION: float = 700.0
@@ -8,19 +9,26 @@ const MAX_VELOCITY: float = 800.0
 const JUMP_STRENGTH: float = 300.0
 const AIR_CONTROL_FACTOR: float = 0.4
 const GROUND_FRICTION: float = 100.0
-const UPSIDE_DOWN_STICK_THRESHOLD: float = 550.0
+const UPSIDE_DOWN_STICK_THRESHOLD: float = 400.0
+const BOUNCE_VELOCITY_THRESHOLD: float = 150.0
 
-var move_state: movementMode = movementMode.ROLL
+var move_state: movementMode
 var is_grounded: bool = false
 var is_jumping: bool = false
+var is_bouncing: bool = false
+var prev_frame_velocity: Vector2
 
 var is_falling_animation: bool = false
+var is_bouncing_animation: bool = false
+var is_blurred: bool = false
 var speeding: bool = false
 const SPEEDING_LIMIT: float = 550.0
 
 var circumference: float
 var ang_velocity: float
 const ANG_FRICTION: float = PI/16
+
+var camera_target_position: Vector2 = Vector2(0,0)
 
 @onready var body = $RollingCollisionBody
 @onready var sprite_mask = $Sprites
@@ -30,6 +38,8 @@ const ANG_FRICTION: float = PI/16
 @onready var sensor = $GroundSensorCast
 @onready var snap_sensor = $AirborneSensorCast
 @onready var anim_player = $Sprites/AnimationPlayer
+@onready var state_machine = $StateMachine
+@onready var camera = $Camera2D
 
 
 func _ready() -> void:
@@ -49,7 +59,7 @@ func _physics_process(delta: float) -> void:
 		
 	velocity = velocity.clampf(-MAX_VELOCITY, MAX_VELOCITY)
 	
-	if velocity_direction.is_zero_approx() and is_grounded:
+	if velocity_direction.is_zero_approx() and is_grounded: 
 		velocity += velocity.direction_to(Vector2.ZERO) * GROUND_FRICTION * delta # apply friction
 		if velocity.length() <= 6 and (abs(up_direction.angle_to(Vector2.UP)) < PI/16): 
 			velocity = Vector2.ZERO
@@ -65,8 +75,13 @@ func _physics_process(delta: float) -> void:
 	sprite_speed()
 	face_shift()
 	
+	prev_frame_velocity = velocity
+	
 	if move_and_slide(): #if collision occurs
-		calculate_floor_angle()
+		if should_bounce():
+			bounce()
+		else:
+			calculate_floor_angle()
 	else: # no collision occurred, but check to see if we are accidentally leaving the ground
 		sensor_vector()
 	
@@ -74,10 +89,11 @@ func _physics_process(delta: float) -> void:
 
 
 func calculate_floor_angle() -> void: # only called if a collision is happening
-	if is_on_floor():
+	if is_on_floor_only():
 		up_direction = get_last_slide_collision().get_normal()
 		sprite_land()
 		is_grounded = true
+		is_bouncing = false
 		
 	elif !is_grounded: #if in air but contacting a surface...
 		if get_last_slide_collision().get_collider().get_collision_layer() == 4: #contacting "slippery" wall
@@ -88,19 +104,61 @@ func calculate_floor_angle() -> void: # only called if a collision is happening
 		else: 
 			sprite_land()
 			is_grounded = true
+			is_bouncing = false
 	else: 
 		up_direction = Vector2.UP
 	
 	sensor.rotation = up_direction.angle() + PI/2
 
 
+func should_bounce() -> bool:
+	var normal = get_last_slide_collision().get_normal()
+	var velocity_to_normal = prev_frame_velocity.bounce(normal).project(normal)
+	return abs(prev_frame_velocity.bounce(normal).angle_to(normal)) < PI/4 and velocity_to_normal.length() > BOUNCE_VELOCITY_THRESHOLD
+
+
+func should_bounce_ray(collision: RayCast2D) -> bool:
+	var normal = collision.get_collision_normal()
+	var velocity_to_normal = velocity.bounce(normal).project(normal)
+	return (abs(velocity.bounce(normal).angle_to(normal)) < PI/4) and velocity.length() > BOUNCE_VELOCITY_THRESHOLD
+
+
+func bounce() -> void:
+	# Project velocity onto normal vector and tangent vector
+	var normal = get_last_slide_collision().get_normal()
+	var tangent
+	if prev_frame_velocity.x < 0:
+		tangent = normal.rotated(PI/4)
+	else:
+		tangent = normal.rotated(-(PI/4))
+	var normal_vector = prev_frame_velocity.project(normal)
+	var tangent_vector = prev_frame_velocity.project(tangent)
+	
+	# Determine if the bounce is a hard bounce (within PI/12 or 15 degrees either direction)
+	if abs(prev_frame_velocity.bounce(normal).angle_to(normal)) < PI/12: # Hard bounce
+		print("Hard bounce")
+		normal_vector *= -0.5 # bounce off of normal hard
+		tangent_vector *= 0.4 # kill tangent speed for a thumpier bounce
+	else: # Soft bounce
+		print("Soft bounce")
+		normal_vector *= -0.9 # bounce off of normal, number is high because velocity going into the bounce is usually low
+		tangent_vector *= 0.95 # maintain tangent speed
+	
+	var bounce_vector = normal_vector + tangent_vector
+	
+	is_grounded = false
+	is_bouncing = true
+	velocity = bounce_vector
+	
+
+
 func sensor_vector() -> void:
-	if sensor.is_colliding() and !is_jumping: 
+	if sensor.is_colliding() and !is_jumping and !is_bouncing: 
 		# we must have disconnected from the ground on a concave curve
 		
 		up_direction = sensor.get_collision_normal()
 		apply_floor_snap()
-	elif !(sensor.is_colliding()) and is_jumping:
+	elif !(sensor.is_colliding()) and (is_jumping or is_bouncing):
 		is_jumping = false
 		# we have cleared the ground by now, we can use the airborne sensor cast
 		snap_sensor.rotation = velocity.angle()
@@ -120,7 +178,7 @@ func sensor_vector() -> void:
 
 
 func sphere_snap() -> void:
-	if snap_sensor.is_colliding():
+	if snap_sensor.is_colliding() and !should_bounce_ray(snap_sensor):
 		if snap_sensor.get_collider().get_collision_layer() == 4:
 			#slippery wall
 			if snap_sensor.get_collision_normal().angle_to(Vector2.UP) < PI/8:
@@ -150,16 +208,24 @@ func sprite_roll(delta: float) -> void:
 		elif ang_velocity < 0: # rotating counterclockwise
 			ang_velocity = min(0, ang_velocity + ANG_FRICTION * delta)
 	
+	if !(ang_velocity > -0.2 and ang_velocity < 0.2): # 0.37 is speeding ang_velocity
+		blur(true)
+	else:
+		blur(false)
+	
 	sprite.rotate(ang_velocity)
 	spikes.rotate(ang_velocity)
 	
 	if is_falling_animation:
 		sprite_mask.rotation = velocity.angle()
+	if is_bouncing_animation:
+		sprite_mask.rotation = velocity.angle() - PI/2
 
 
 func face_shift() -> void:
 	var factor = velocity.length() / MAX_VELOCITY
 	face.position = velocity.normalized() * factor * 5
+	camera.position = velocity.normalized() * factor * 100
 
 
 func sprite_jump() -> void:
@@ -197,8 +263,24 @@ func sprite_speed() -> void:
 		sprite_mask.skew = sprite_mask.skew * -1
 
 
+func blur(blur: bool) -> void:
+	if is_blurred != blur:
+		is_blurred = blur
+		var tween = create_tween()
+		if blur:
+			tween.tween_method(set_param, 0.0, 0.1, 0.5)
+		else:
+			tween.tween_method(set_param, 0.1, 0.0, 0.5)
+		await tween.finished
+		tween.kill()
+
+
+func set_param(val: float) -> void:
+	spikes.material.set_shader_parameter("amount", val)
+	sprite.material.set_shader_parameter("amount", val)
+
+
 func sprite_anim_changed(old_anim, new_anim) -> void:
-	print("Animation changed: " + old_anim + " -> " + new_anim)
 	if new_anim == "fall_loop":
 		is_falling_animation = true
 	
@@ -207,6 +289,9 @@ func sprite_anim_changed(old_anim, new_anim) -> void:
 	
 	if old_anim == "land":
 		sprite_mask.rotation = 0;
+	
+	if old_anim == "bounce":
+		is_bouncing_animation = false
 
 
 func get_input() -> Vector2:
