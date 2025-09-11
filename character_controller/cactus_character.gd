@@ -74,7 +74,7 @@ func _physics_process(delta: float) -> void:
 
 
 func calculate_floor_angle() -> void: # only called if a collision is happening
-	if is_on_floor_only():
+	if is_on_floor():
 		up_direction = get_last_slide_collision().get_normal()
 		sprite_land()
 		is_grounded = true

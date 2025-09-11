@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://dv2fvm0k6kwgk"]
+[gd_scene load_steps=3 format=3 uid="uid://wsvhdldpilks"]
 
 [ext_resource type="PackedScene" uid="uid://ddejxwou8bqg4" path="res://scenes/test_level.tscn" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://bj4m25q3cbdav" path="res://character_controller/cactus_character.tscn" id="2_h2yge"]
