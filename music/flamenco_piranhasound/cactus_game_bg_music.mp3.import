@@ -12,8 +12,8 @@ dest_files=["res://.godot/imported/cactus_game_bg_music.mp3-2740f0e579954714ba8c
 
 [params]
 
-loop=false
-loop_offset=0
-bpm=0
+loop=true
+loop_offset=0.0
+bpm=220.0
 beat_count=0
 bar_beats=4

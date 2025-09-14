@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://b85vb2pqujxf5"]
+
+[ext_resource type="Script" uid="uid://nmo3ibsf06v8" path="res://scripts/music_player.gd" id="1_qitqb"]
+[ext_resource type="AudioStream" uid="uid://dhlme7krjnp17" path="res://music/flamenco_piranhasound/cactus_game_bg_music.mp3" id="2_8nf8j"]
+
+[node name="MusicPlayer" type="Node"]
+script = ExtResource("1_qitqb")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_8nf8j")
+autoplay = true
+bus = &"Music"
+parameters/looping = false
+
+[connection signal="finished" from="AudioStreamPlayer" to="." method="_on_audio_stream_player_finished"]

@@ -1,0 +1,64 @@
+[gd_scene load_steps=3 format=3 uid="uid://c7gn25buokcyk"]
+
+[ext_resource type="Script" uid="uid://byn7sbqrpxhj4" path="res://GUI/sound_effect_volume_slider.gd" id="1_5x3h2"]
+[ext_resource type="Script" uid="uid://bsc51y77jfvo" path="res://GUI/music_volume_slider.gd" id="1_isp32"]
+
+[node name="MainGui" type="CanvasLayer"]
+
+[node name="MusicVolumeControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MusicVolumeControl"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -47.0
+offset_right = 200.0
+grow_vertical = 0
+
+[node name="SoundEffectsVBox" type="VBoxContainer" parent="MusicVolumeControl/VBoxContainer"]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MusicVolumeControl/VBoxContainer/SoundEffectsVBox"]
+layout_mode = 2
+
+[node name="VolumeLabel" type="Label" parent="MusicVolumeControl/VBoxContainer/SoundEffectsVBox/CenterContainer"]
+layout_mode = 2
+text = "Sound effect volume"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="MusicVolumeControl/VBoxContainer/SoundEffectsVBox"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+focus_mode = 0
+max_value = 1.0
+step = 0.01
+value = 0.8
+scrollable = false
+script = ExtResource("1_5x3h2")
+
+[node name="MusicVBox" type="VBoxContainer" parent="MusicVolumeControl/VBoxContainer"]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MusicVolumeControl/VBoxContainer/MusicVBox"]
+layout_mode = 2
+
+[node name="VolumeLabel" type="Label" parent="MusicVolumeControl/VBoxContainer/MusicVBox/CenterContainer"]
+layout_mode = 2
+text = "Music volume"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="MusicVolumeControl/VBoxContainer/MusicVBox"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+focus_mode = 0
+max_value = 1.0
+step = 0.01
+value = 0.8
+scrollable = false
+script = ExtResource("1_isp32")

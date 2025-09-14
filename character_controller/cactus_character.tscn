@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bj4m25q3cbdav"]
+[gd_scene load_steps=26 format=3 uid="uid://bj4m25q3cbdav"]
 
 [ext_resource type="Script" uid="uid://su71ys0dpfy8" path="res://character_controller/cactus_character.gd" id="1_a3la2"]
 [ext_resource type="Material" uid="uid://dwfkml8ge6fjc" path="res://shaders/radial_blur_shader.tres" id="2_8fxv4"]
@@ -8,6 +8,12 @@
 [ext_resource type="Script" uid="uid://cken6h6q8dnbg" path="res://character_controller/state_machine.gd" id="5_8vj48"]
 [ext_resource type="Script" uid="uid://bbfmuqel5wg83" path="res://character_controller/rolling_state.gd" id="6_fl4nu"]
 [ext_resource type="Script" uid="uid://bxth4v4qmomc8" path="res://character_controller/spines_state.gd" id="7_8fxv4"]
+[ext_resource type="AudioStream" uid="uid://cqh3s58t8t1i8" path="res://sound_effects/jump_noises/hup_noises.mp3" id="9_vb0w1"]
+[ext_resource type="AudioStream" uid="uid://da58o5jbfdcp2" path="res://sound_effects/jump_noises/hup_noises_1.mp3" id="10_qnufa"]
+[ext_resource type="AudioStream" uid="uid://bkl4r7ktg7hb" path="res://sound_effects/jump_noises/hup_noises_2.mp3" id="11_2vop7"]
+[ext_resource type="AudioStream" uid="uid://b420s6mtckllf" path="res://sound_effects/jump_noises/hup_noises_3.mp3" id="12_pm0ux"]
+[ext_resource type="AudioStream" uid="uid://dx6f0xu66b0cj" path="res://sound_effects/landing_thump.mp3" id="13_qnufa"]
+[ext_resource type="AudioStream" uid="uid://cqynyw7fx7x7n" path="res://sound_effects/rolling_sound_effect.mp3" id="14_2vop7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdr8x"]
 radius = 25.0
@@ -64,6 +70,34 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_lqmuw"]
+resource_name = "bounce"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.5, 0.75), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../FaceSprite:scale")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.975, 0.6), Vector2(0.975, 0.6)]
 }
 
 [sub_resource type="Animation" id="Animation_fl4nu"]
@@ -196,34 +230,6 @@ tracks/0/keys = {
 "values": [-0.139626, -0.20944, -0.139626]
 }
 
-[sub_resource type="Animation" id="Animation_lqmuw"]
-resource_name = "bounce"
-length = 0.4
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:scale")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(1.5, 0.75), Vector2(1, 1)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("../FaceSprite:scale")
-tracks/1/interp = 2
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(0.975, 0.6), Vector2(0.975, 0.6)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_b6phq"]
 _data = {
 &"RESET": SubResource("Animation_8vj48"),
@@ -234,6 +240,13 @@ _data = {
 &"land": SubResource("Animation_b6phq"),
 &"speeding": SubResource("Animation_57hka")
 }
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_pvsxg"]
+streams_count = 4
+stream_0/stream = ExtResource("9_vb0w1")
+stream_1/stream = ExtResource("10_qnufa")
+stream_2/stream = ExtResource("11_2vop7")
+stream_3/stream = ExtResource("12_pm0ux")
 
 [node name="CactusPlayer" type="CharacterBody2D"]
 collision_mask = 6
@@ -311,5 +324,19 @@ script = ExtResource("7_8fxv4")
 [node name="Camera2D" type="Camera2D" parent="."]
 position_smoothing_enabled = true
 position_smoothing_speed = 17.0
+
+[node name="JumpEffectsPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = SubResource("AudioStreamRandomizer_pvsxg")
+volume_db = 5.918
+bus = &"Sounds"
+
+[node name="LandingEffectsPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("13_qnufa")
+bus = &"Sounds"
+
+[node name="RollingEffectPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("14_2vop7")
+autoplay = true
+bus = &"Sounds"
 
 [connection signal="animation_changed" from="Sprites/AnimationPlayer" to="." method="sprite_anim_changed"]

@@ -40,11 +40,14 @@ var camera_target_position: Vector2 = Vector2(0,0)
 @onready var anim_player = $Sprites/AnimationPlayer
 @onready var state_machine = $StateMachine
 @onready var camera = $Camera2D
+@onready var jump_effects_player = $JumpEffectsPlayer2D
+@onready var landing_effects_player = $LandingEffectsPlayer2D
 
 
 func _ready() -> void:
 	circumference = 25 * 2 * PI # r * 2 * PI
 
+#region physics
 
 func _physics_process(delta: float) -> void:
 	# velocity calculation
@@ -79,6 +82,7 @@ func _physics_process(delta: float) -> void:
 	
 	if move_and_slide(): #if collision occurs
 		if should_bounce():
+			play_land_sound() # TODO: scale volume based on speed
 			bounce()
 		else:
 			calculate_floor_angle()
@@ -102,6 +106,7 @@ func calculate_floor_angle() -> void: # only called if a collision is happening
 				up_direction = Vector2.UP
 				is_grounded = false
 		else: 
+			play_land_sound()
 			sprite_land()
 			is_grounded = true
 			is_bouncing = false
@@ -192,7 +197,10 @@ func sphere_snap() -> void:
 			up_direction = snap_sensor.get_collision_normal()
 			sprite_land()
 			apply_floor_snap()
+			
+#endregion
 
+#region sprite manipulation
 
 func sprite_roll(delta: float) -> void:
 	var distance: float = velocity.length() * delta
@@ -293,6 +301,20 @@ func sprite_anim_changed(old_anim, new_anim) -> void:
 	if old_anim == "bounce":
 		is_bouncing_animation = false
 
+#endregion
+
+#region sound effects
+
+func play_jump_sound() -> void:
+	jump_effects_player.play()
+	
+func play_land_sound(impact_strength: float = 0.5):
+	landing_effects_player.play()
+	
+
+
+#endregion
+
 
 func get_input() -> Vector2:
 	if move_state == movementMode.ROLL:
@@ -303,7 +325,9 @@ func get_input() -> Vector2:
 
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("jump") and is_grounded:
-		print("jump pressed")
+		print("jump pressed while grounded")
 		velocity += up_direction * JUMP_STRENGTH
 		is_jumping = true
+		play_jump_sound()
 		sprite_jump()
+	
