@@ -42,6 +42,7 @@ var camera_target_position: Vector2 = Vector2(0,0)
 @onready var camera = $Camera2D
 @onready var jump_effects_player = $JumpEffectsPlayer2D
 @onready var landing_effects_player = $LandingEffectsPlayer2D
+@onready var rolling_effects_player = $RollingEffectPlayer2D
 
 
 func _ready() -> void:
@@ -82,12 +83,14 @@ func _physics_process(delta: float) -> void:
 	
 	if move_and_slide(): #if collision occurs
 		if should_bounce():
-			play_land_sound() # TODO: scale volume based on speed
+			play_land_sound(velocity.length() / (MAX_VELOCITY * sqrt(2)))
 			bounce()
 		else:
 			calculate_floor_angle()
 	else: # no collision occurred, but check to see if we are accidentally leaving the ground
 		sensor_vector()
+		
+	adjust_rolling_effect(velocity.length(), is_grounded)
 	
 	$velvector.rotation = velocity.angle() + PI/2 ## TEMP
 
@@ -309,12 +312,29 @@ func play_jump_sound() -> void:
 	jump_effects_player.play()
 	
 func play_land_sound(impact_strength: float = 0.5):
+	if impact_strength < 0 or impact_strength > 1:
+		push_warning("landing sound impact strength should be between 0 and 1")
+	landing_effects_player.volume_linear = impact_strength
 	landing_effects_player.play()
 	
-
+const pitch_constant : float = 1.5
+func adjust_rolling_effect(roll_speed: float, is_grounded: bool):
+	if !is_grounded or is_zero_approx(roll_speed):
+		rolling_effects_player.volume_linear = 0
+		return
+	
+	rolling_effects_player.volume_linear = roll_speed / (MAX_VELOCITY * sqrt(2))
+	rolling_effects_player.pitch_scale = pitch_constant * (roll_speed / (MAX_VELOCITY * sqrt(2)))
 
 #endregion
 
+# For viewing velocity in the editor when debugging
+func _get_property_list() -> Array[Dictionary]:
+	return [{
+		"name": "velocity",
+		"type": TYPE_VECTOR2,
+		"usage": PROPERTY_USAGE_EDITOR
+	}]
 
 func get_input() -> Vector2:
 	if move_state == movementMode.ROLL:
