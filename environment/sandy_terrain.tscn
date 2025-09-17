@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwqsnrlrojv4f"]
+
+[ext_resource type="Script" uid="uid://b2rpgrpxdcvi8" path="res://environment/sandy_terrain.gd" id="1_6mofw"]
+
+[node name="SandyTerrain" type="StaticBody2D"]
+collision_layer = 2
+script = ExtResource("1_6mofw")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
